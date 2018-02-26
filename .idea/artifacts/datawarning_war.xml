@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="datawarning:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="datawarning.war">
+      <element id="artifact" artifact-name="datawarning:war exploded" />
+    </root>
+  </artifact>
+</component>

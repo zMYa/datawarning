@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.feihe.dao.report.AreaDaySaleDao" >
+  <resultMap id="BaseResultMap" type="com.feihe.domain.report.AreaDaySale" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="so_id" property="soId" jdbcType="INTEGER" />
+    <result column="so_name" property="soName" jdbcType="VARCHAR" />
+    <result column="region_id" property="regionId" jdbcType="INTEGER" />
+    <result column="region_name" property="regionName" jdbcType="VARCHAR" />
+    <result column="district_id" property="districtId" jdbcType="INTEGER" />
+    <result column="district_name" property="districtName" jdbcType="VARCHAR" />
+    <result column="citygroup_id" property="citygroupId" jdbcType="INTEGER" />
+    <result column="citygroup_name" property="citygroupName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="series_id" property="seriesId" jdbcType="INTEGER" />
+    <result column="series_name" property="seriesName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="report_time" property="reportTime" jdbcType="VARCHAR" />
+    <result column="sale_nums" property="saleNums" jdbcType="INTEGER" />
+    <result column="sale_prices" property="salePrices" jdbcType="DECIMAL" />
+    <result column="refunds_nums" property="refundsNums" jdbcType="INTEGER" />
+    <result column="refunds_prices" property="refundsPrices" jdbcType="DECIMAL" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, so_id, so_name, region_id, region_name, district_id, district_name, citygroup_id, 
+    citygroup_name, city_id, city_name, series_id, series_name, create_time, report_time, sale_nums, sale_prices, 
+    refunds_nums, refunds_prices
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from report_area_day_sale
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectSaleNumsByDistrictId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  	select district_id,district_name,sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale where district_id=#{districtId,jdbcType=INTEGER} 
+	and to_days(now())-to_days(report_time)=1
+  </select>
+  
+  <select id="selectSaleNumsByCityGroupId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  	select citygroup_id,citygroup_name,sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale where citygroup_id=#{cityGroupId,jdbcType=INTEGER}  
+	and to_days(now())-to_days(report_time)=1
+  </select>
+  
+  <select id="selectSaleNumsByCityId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  	select city_id,city_name,sale_nums,sale_prices,refunds_nums,refunds_prices
+	from report_area_day_sale where city_id=#{cityId,jdbcType=INTEGER}  
+    and to_days(now())-to_days(report_time)=1
+  </select>
+  
+  <select id="selectSaleNumsByDistrictIdTime" resultMap="BaseResultMap" >
+  	select report_time,district_id,district_name,sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale where district_id=#{districtId,jdbcType=INTEGER}  
+	and report_time between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by report_time order by report_time
+  </select>
+  
+  <select id="selectSaleNumsByCityGroupIdTime" resultMap="BaseResultMap" >
+  	select report_time,citygroup_id,citygroup_name,sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale where citygroup_id=#{cityGroupId,jdbcType=INTEGER}   
+	and report_time between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR} 
+	group by report_time order by report_time
+  </select>
+  
+  <select id="selectSaleNumsByCityIdTime" resultMap="BaseResultMap" >
+  	select report_time,city_id,city_name,sale_nums,sale_prices,refunds_nums,refunds_prices
+	from report_area_day_sale where city_id=#{cityId,jdbcType=INTEGER}    
+	and report_time between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+	group by report_time order by report_time
+  </select>
+  
+  <select id="selectSeriesSaleNumsByDistrictIdTime" resultMap="BaseResultMap" >
+  	select report_time,district_id,district_name,series_id,series_name,sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale where district_id=#{districtId,jdbcType=INTEGER}  
+	<if test="seriesId != null and seriesId != '' " >
+    	and series_id = #{seriesId,jdbcType=INTEGER}
+    </if>
+	and report_time between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by report_time,series_id order by report_time
+  </select>
+  
+  <select id="selectSeriesSaleNumsByCityGroupIdTime" resultMap="BaseResultMap" >
+  	select report_time,citygroup_id,citygroup_name,series_id,series_name,sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale where citygroup_id=#{cityGroupId,jdbcType=INTEGER}   
+	<if test="seriesId != null and seriesId != '' " >
+    	and series_id = #{seriesId,jdbcType=INTEGER}
+    </if>
+	and report_time between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR} 
+	group by report_time,series_id order by report_time
+  </select>
+  
+  <select id="selectSeriesSaleNumsByCityIdTime" resultMap="BaseResultMap" >
+  	select report_time,city_id,city_name,series_id,series_name,sale_nums,sale_prices,refunds_nums,refunds_prices
+	from report_area_day_sale where city_id=#{cityId,jdbcType=INTEGER}    
+	<if test="seriesId != null and seriesId != '' " >
+    	and series_id = #{seriesId,jdbcType=INTEGER}
+    </if>
+	and report_time between #{startDate,jdbcType=VARCHAR} and #{endDate,jdbcType=VARCHAR}
+	group by report_time,series_id order by report_time
+  </select>
+  
+  <select id="selectSaleNumsByDistrictIdMonthTime" resultMap="BaseResultMap" >
+  	select district_id,district_name,substr(report_time,1,7) as report_time,
+	sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale 
+	where district_id=#{districtId,jdbcType=INTEGER}  
+	and DATE_FORMAT(report_time, '%Y-%m') between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by substr(report_time,1,7) order by report_time
+  </select>
+  
+  <select id="selectSaleNumsByCityGroupIdMonthTime" resultMap="BaseResultMap" >
+  	select citygroup_id,citygroup_name,substr(report_time,1,7) as report_time,
+	sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale 
+	where citygroup_id=#{cityGroupId,jdbcType=INTEGER}  
+	and DATE_FORMAT(report_time, '%Y-%m') between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by substr(report_time,1,7) order by report_time
+  </select>
+  
+  <select id="selectSaleNumsByCityIdMonthTime" resultMap="BaseResultMap" >
+  	select city_id,city_name,substr(report_time,1,7) as report_time,
+	sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale 
+	where city_id=#{cityId,jdbcType=INTEGER}  
+	and DATE_FORMAT(report_time, '%Y-%m') between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by substr(report_time,1,7) order by report_time
+  </select>
+  
+  <select id="selectSeriesSaleNumsByDistrictIdMonthTime" resultMap="BaseResultMap" >
+  	select district_id,district_name,series_id,series_name,substr(report_time,1,7) as report_time,
+	sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale 
+	where district_id=#{districtId,jdbcType=INTEGER} 
+	<if test="seriesId != null and seriesId != '' " >
+    	and series_id = #{seriesId,jdbcType=INTEGER}
+    </if> 
+	and DATE_FORMAT(report_time, '%Y-%m') between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by substr(report_time,1,7),series_id order by report_time
+  </select>
+  
+  <select id="selectSeriesSaleNumsByCityGroupIdMonthTime" resultMap="BaseResultMap" >
+  	select citygroup_id,citygroup_name,series_id,series_name,substr(report_time,1,7) as report_time,
+	sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale 
+	where citygroup_id=#{cityGroupId,jdbcType=INTEGER}  
+	<if test="seriesId != null and seriesId != '' " >
+    	and series_id = #{seriesId,jdbcType=INTEGER}
+    </if>
+	and DATE_FORMAT(report_time, '%Y-%m') between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by substr(report_time,1,7),series_id order by report_time
+  </select>
+  
+  <select id="selectSeriesSaleNumsByCityIdMonthTime" resultMap="BaseResultMap" >
+  	select city_id,city_name,series_id,series_name,substr(report_time,1,7) as report_time,
+	sum(sale_nums) as sale_nums,sum(sale_prices) as sale_prices,
+	sum(refunds_nums) as refunds_nums,sum(refunds_prices) as refunds_prices
+	from report_area_day_sale 
+	where city_id=#{cityId,jdbcType=INTEGER}  
+	<if test="seriesId != null and seriesId != '' " >
+    	and series_id = #{seriesId,jdbcType=INTEGER}
+    </if>
+	and DATE_FORMAT(report_time, '%Y-%m') between #{startDate,jdbcType=VARCHAR}  and #{endDate,jdbcType=VARCHAR}  
+	group by substr(report_time,1,7),series_id order by report_time
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from report_area_day_sale
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.feihe.domain.report.AreaDaySale" >
+    insert into report_area_day_sale (id, so_id, so_name, 
+      region_id, region_name, district_id, 
+      district_name, citygroup_id, citygroup_name, 
+      city_id, city_name, series_id, series_name, create_time, 
+      report_time, sale_nums, sale_prices, 
+      refunds_nums, refunds_prices)
+    values (#{id,jdbcType=INTEGER}, #{soId,jdbcType=INTEGER}, #{soName,jdbcType=VARCHAR}, 
+      #{regionId,jdbcType=INTEGER}, #{regionName,jdbcType=VARCHAR}, #{districtId,jdbcType=INTEGER}, 
+      #{districtName,jdbcType=VARCHAR}, #{citygroupId,jdbcType=INTEGER}, #{citygroupName,jdbcType=VARCHAR}, 
+      #{cityId,jdbcType=INTEGER}, #{cityName,jdbcType=VARCHAR},
+      #{seriesId,jdbcType=INTEGER}, #{seriesName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{reportTime,jdbcType=TIMESTAMP}, #{saleNums,jdbcType=INTEGER}, #{salePrices,jdbcType=DECIMAL}, 
+      #{refundsNums,jdbcType=INTEGER}, #{refundsPrices,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.feihe.domain.report.AreaDaySale" >
+    insert into report_area_day_sale
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="soId != null" >
+        so_id,
+      </if>
+      <if test="soName != null" >
+        so_name,
+      </if>
+      <if test="regionId != null" >
+        region_id,
+      </if>
+      <if test="regionName != null" >
+        region_name,
+      </if>
+      <if test="districtId != null" >
+        district_id,
+      </if>
+      <if test="districtName != null" >
+        district_name,
+      </if>
+      <if test="citygroupId != null" >
+        citygroup_id,
+      </if>
+      <if test="citygroupName != null" >
+        citygroup_name,
+      </if>
+      <if test="cityId != null" >
+        city_id,
+      </if>
+      <if test="cityName != null" >
+        city_name,
+      </if>
+      <if test="seriesId != null" >
+        series_id,
+      </if>
+      <if test="seriesName != null" >
+        series_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="reportTime != null" >
+        report_time,
+      </if>
+      <if test="saleNums != null" >
+        sale_nums,
+      </if>
+      <if test="salePrices != null" >
+        sale_prices,
+      </if>
+      <if test="refundsNums != null" >
+        refunds_nums,
+      </if>
+      <if test="refundsPrices != null" >
+        refunds_prices,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="soId != null" >
+        #{soId,jdbcType=INTEGER},
+      </if>
+      <if test="soName != null" >
+        #{soName,jdbcType=VARCHAR},
+      </if>
+      <if test="regionId != null" >
+        #{regionId,jdbcType=INTEGER},
+      </if>
+      <if test="regionName != null" >
+        #{regionName,jdbcType=VARCHAR},
+      </if>
+      <if test="districtId != null" >
+        #{districtId,jdbcType=INTEGER},
+      </if>
+      <if test="districtName != null" >
+        #{districtName,jdbcType=VARCHAR},
+      </if>
+      <if test="citygroupId != null" >
+        #{citygroupId,jdbcType=INTEGER},
+      </if>
+      <if test="citygroupName != null" >
+        #{citygroupName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="seriesId != null" >
+        #{seriesId,jdbcType=INTEGER},
+      </if>
+      <if test="seriesName != null" >
+        #{seriesName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reportTime != null" >
+        #{reportTime,jdbcType=VARCHAR},
+      </if>
+      <if test="saleNums != null" >
+        #{saleNums,jdbcType=INTEGER},
+      </if>
+      <if test="salePrices != null" >
+        #{salePrices,jdbcType=DECIMAL},
+      </if>
+      <if test="refundsNums != null" >
+        #{refundsNums,jdbcType=INTEGER},
+      </if>
+      <if test="refundsPrices != null" >
+        #{refundsPrices,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.feihe.domain.report.AreaDaySale" >
+    update report_area_day_sale
+    <set >
+      <if test="soId != null" >
+        so_id = #{soId,jdbcType=INTEGER},
+      </if>
+      <if test="soName != null" >
+        so_name = #{soName,jdbcType=VARCHAR},
+      </if>
+      <if test="regionId != null" >
+        region_id = #{regionId,jdbcType=INTEGER},
+      </if>
+      <if test="regionName != null" >
+        region_name = #{regionName,jdbcType=VARCHAR},
+      </if>
+      <if test="districtId != null" >
+        district_id = #{districtId,jdbcType=INTEGER},
+      </if>
+      <if test="districtName != null" >
+        district_name = #{districtName,jdbcType=VARCHAR},
+      </if>
+      <if test="citygroupId != null" >
+        citygroup_id = #{citygroupId,jdbcType=INTEGER},
+      </if>
+      <if test="citygroupName != null" >
+        citygroup_name = #{citygroupName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null" >
+        city_id = #{cityId,jdbcType=INTEGER},
+      </if>
+      <if test="cityName != null" >
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="seriesId != null" >
+        series_id = #{seriesId,jdbcType=INTEGER},
+      </if>
+      <if test="seriesName != null" >
+      	series_name = #{seriesName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reportTime != null" >
+        report_time = #{reportTime,jdbcType=VARCHAR},
+      </if>
+      <if test="saleNums != null" >
+        sale_nums = #{saleNums,jdbcType=INTEGER},
+      </if>
+      <if test="salePrices != null" >
+        sale_prices = #{salePrices,jdbcType=DECIMAL},
+      </if>
+      <if test="refundsNums != null" >
+        refunds_nums = #{refundsNums,jdbcType=INTEGER},
+      </if>
+      <if test="refundsPrices != null" >
+        refunds_prices = #{refundsPrices,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.feihe.domain.report.AreaDaySale" >
+    update report_area_day_sale
+    set so_id = #{soId,jdbcType=INTEGER},
+      so_name = #{soName,jdbcType=VARCHAR},
+      region_id = #{regionId,jdbcType=INTEGER},
+      region_name = #{regionName,jdbcType=VARCHAR},
+      district_id = #{districtId,jdbcType=INTEGER},
+      district_name = #{districtName,jdbcType=VARCHAR},
+      citygroup_id = #{citygroupId,jdbcType=INTEGER},
+      citygroup_name = #{citygroupName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=INTEGER},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      series_id = #{seriesId,jdbcType=INTEGER},
+      series_name = #{seriesName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      report_time = #{reportTime,jdbcType=VARCHAR},
+      sale_nums = #{saleNums,jdbcType=INTEGER},
+      sale_prices = #{salePrices,jdbcType=DECIMAL},
+      refunds_nums = #{refundsNums,jdbcType=INTEGER},
+      refunds_prices = #{refundsPrices,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

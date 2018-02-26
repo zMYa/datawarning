@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.feihe.dao.report.ShopMonthSaleDao" >
+  <resultMap id="BaseResultMap" type="com.feihe.domain.report.ShopMonthSale" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="shop_no" property="shopNo" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="bill_money" property="billMoney" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, shop_no, name, bill_money
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from report_shop_month_sale
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByStoreIds" resultMap="BaseResultMap" parameterType="java.util.Set" >
+    select 
+    <include refid="Base_Column_List" />
+    from report_shop_month_sale where shop_no in 
+    <foreach collection="set" item="item" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from report_shop_month_sale
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.feihe.domain.report.ShopMonthSale" >
+    insert into report_shop_month_sale (id, shop_no, name, 
+      bill_money)
+    values (#{id,jdbcType=INTEGER}, #{shopNo,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{billMoney,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.feihe.domain.report.ShopMonthSale" >
+    insert into report_shop_month_sale
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="shopNo != null" >
+        shop_no,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="billMoney != null" >
+        bill_money,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="shopNo != null" >
+        #{shopNo,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="billMoney != null" >
+        #{billMoney,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.feihe.domain.report.ShopMonthSale" >
+    update report_shop_month_sale
+    <set >
+      <if test="shopNo != null" >
+        shop_no = #{shopNo,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="billMoney != null" >
+        bill_money = #{billMoney,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.feihe.domain.report.ShopMonthSale" >
+    update report_shop_month_sale
+    set shop_no = #{shopNo,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      bill_money = #{billMoney,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

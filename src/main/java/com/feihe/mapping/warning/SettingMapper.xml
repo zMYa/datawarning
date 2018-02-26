@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.feihe.dao.warning.SettingDao" >
+  <resultMap id="BaseResultMap" type="com.feihe.domain.warning.Setting" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="store_num_min" property="storeNumMin" jdbcType="INTEGER" />
+    <result column="store_num_max" property="storeNumMax" jdbcType="INTEGER" />
+    <result column="warning_new_num" property="warningNewNum" jdbcType="INTEGER" />
+    <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
+    <result column="create_user_name" property="createUserName" jdbcType="VARCHAR" />
+    <result column="update_user_id" property="updateUserId" jdbcType="INTEGER" />
+    <result column="update_user_name" property="updateUserName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, create_date, update_date, store_num_min,store_num_max, warning_new_num, create_user_id, create_user_name, 
+    update_user_id, update_user_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from warning_setting
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectWarningNumBySaleNum" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select a.warning_new_num from (
+	select store_num_min,ifnull(store_num_max,999999999) as store_num_max,warning_new_num from warning_setting) as a
+	where a.store_num_min &lt;=#{saleNum,jdbcType=INTEGER} and a.store_num_max &gt;=#{saleNum,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from warning_setting
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from warning_setting
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.feihe.domain.warning.Setting" >
+    insert into warning_setting (id, create_date, update_date, 
+      store_num_min,store_num_max, warning_new_num, create_user_id, 
+      create_user_name, update_user_id, update_user_name
+      )
+    values (#{id,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{storeNumMin,jdbcType=INTEGER}, #{storeNumMax,jdbcType=INTEGER}, #{warningNewNum,jdbcType=INTEGER}, #{createUserId,jdbcType=INTEGER}, 
+      #{createUserName,jdbcType=VARCHAR}, #{updateUserId,jdbcType=INTEGER}, #{updateUserName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.feihe.domain.warning.Setting" >
+    insert into warning_setting
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="storeNumMin != null" >
+        store_num_min,
+      </if>
+      <if test="storeNumMax != null" >
+        store_num_max,
+      </if>
+      <if test="warningNewNum != null" >
+        warning_new_num,
+      </if>
+      <if test="createUserId != null" >
+        create_user_id,
+      </if>
+      <if test="createUserName != null" >
+        create_user_name,
+      </if>
+      <if test="updateUserId != null" >
+        update_user_id,
+      </if>
+      <if test="updateUserName != null" >
+        update_user_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="storeNumMin != null" >
+        #{storeNumMin,jdbcType=INTEGER},
+      </if>
+      <if test="storeNumMax != null" >
+        #{storeNumMax,jdbcType=INTEGER},
+      </if>
+      <if test="warningNewNum != null" >
+        #{warningNewNum,jdbcType=INTEGER},
+      </if>
+      <if test="createUserId != null" >
+        #{createUserId,jdbcType=INTEGER},
+      </if>
+      <if test="createUserName != null" >
+        #{createUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUserId != null" >
+        #{updateUserId,jdbcType=INTEGER},
+      </if>
+      <if test="updateUserName != null" >
+        #{updateUserName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.feihe.domain.warning.Setting" >
+    update warning_setting
+    <set >
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="storeNumMin != null" >
+        store_num_min = #{storeNumMin,jdbcType=INTEGER},
+      </if>
+      <if test="storeNumMax != null" >
+        store_num_max = #{storeNumMax,jdbcType=INTEGER},
+      </if>
+      <if test="warningNewNum != null" >
+        warning_new_num = #{warningNewNum,jdbcType=INTEGER},
+      </if>
+      <if test="createUserId != null" >
+        create_user_id = #{createUserId,jdbcType=INTEGER},
+      </if>
+      <if test="createUserName != null" >
+        create_user_name = #{createUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateUserId != null" >
+        update_user_id = #{updateUserId,jdbcType=INTEGER},
+      </if>
+      <if test="updateUserName != null" >
+        update_user_name = #{updateUserName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.feihe.domain.warning.Setting" >
+    update warning_setting
+    set create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      store_num_min = #{storeNumMin,jdbcType=INTEGER},
+      store_num_max = #{storeNumMax,jdbcType=INTEGER},
+      warning_new_num = #{warningNewNum,jdbcType=INTEGER},
+      create_user_id = #{createUserId,jdbcType=INTEGER},
+      create_user_name = #{createUserName,jdbcType=VARCHAR},
+      update_user_id = #{updateUserId,jdbcType=INTEGER},
+      update_user_name = #{updateUserName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
